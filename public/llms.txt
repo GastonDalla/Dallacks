@@ -1,0 +1,33 @@
+# Dallacks
+
+> Dallacks is a free music similarity discovery tool. Enter a track name or paste a Discogs, YouTube, or SoundCloud link, and Dallacks returns tracks that sound alike, which you can play directly in the page.
+
+Dallacks helps you find songs that share the same sonic fingerprint as one you already like. It is built for music fans, DJs, and crate diggers who want to explore adjacent sounds without leaving the page.
+
+Site: https://todavianose.gastondalla.com
+Languages: Spanish (default, at `/`) and English (at `/en`).
+Data source: cosine.club — audio embedding and similarity data.
+
+## How it works
+
+1. Search for a track by name, or paste a Discogs, YouTube, or SoundCloud link.
+2. Dallacks resolves the track and computes acoustic similarity using cosine.club embeddings.
+3. You get a ranked list of similar-sounding tracks, each with a similarity score and an in-page player.
+
+## Key pages
+
+- Home (`/`): Single-track search. Find one track and explore its closest sonic matches.
+- Bulk (`/bulk`): Submit multiple tracks or links at once to compare and find shared similar results.
+- Track (`/track/{id}`): Detail page for a single track with its similar tracks, similarity scores, and an in-page player.
+
+## Facts
+
+- Type: Music similarity / discovery web app.
+- Input: track name, or a Discogs / YouTube / SoundCloud link.
+- Output: similar-sounding tracks ranked by acoustic similarity, playable in-page.
+- Similarity is acoustic (sound-based), powered by cosine.club, not based on genre tags or popularity.
+- No account is required to search and listen.
+
+## Español
+
+Dallacks es una herramienta gratuita para descubrir música similar: escribí el nombre de un tema o pegá un enlace de Discogs, YouTube o SoundCloud y obtené temas que suenan parecido, que podés reproducir en la misma página. Disponible en español e inglés. Datos provistos por cosine.club.
