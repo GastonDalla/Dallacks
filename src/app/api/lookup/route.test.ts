@@ -1,6 +1,12 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { resetRateLimit } from "@/lib/http/rate-limit";
+
+vi.mock("next/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("next/server")>();
+  return { ...actual, after: (fn: () => void) => fn() };
+});
+
 import { GET } from "./route";
 
 const req = (url: string) => new NextRequest(url);

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { after } from "next/server";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Container } from "@/components/layout/container";
@@ -11,9 +12,11 @@ import { TrackJsonLd } from "@/components/track/track-jsonld";
 import { ShareButton } from "@/components/ui/share-button";
 import { BreadcrumbJsonLd } from "@/components/seo/breadcrumb-jsonld";
 import { SimilarSection } from "./similar-section";
-import { getTrack } from "@/lib/cosine/endpoints";
+import { getTrack, getSimilar } from "@/lib/cosine/endpoints";
 import { similarFiltersSchema } from "@/lib/cosine/schemas";
 import { SITE_URL } from "@/lib/site";
+import { notifyDiscord } from "@/lib/notify/discord";
+import { trackEmbed } from "@/lib/notify/events";
 import { artistAndTitle, trackHref } from "@/lib/utils/format";
 import type { Locale } from "@/i18n/routing";
 import type { Track, SimilarFilters } from "@/lib/cosine/types";
@@ -102,6 +105,34 @@ export default async function TrackPage({
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   const trackUrl = `${SITE_URL}${locale === "en" ? "/en" : ""}${trackHref(track.id)}`;
   const home = `${SITE_URL}${locale === "en" ? "/en" : ""}`;
+
+  after(async () => {
+    let similarCount = 0;
+    let topSimilar: string[] = [];
+    try {
+      const sim = await getSimilar(track.id, initialFilters);
+      similarCount = sim.data.similar_tracks.length;
+      topSimilar = sim.data.similar_tracks.slice(0, 6).map((tr, i) => {
+        const a = artistAndTitle(tr);
+        const pct = typeof tr.score === "number" ? ` (${Math.round(tr.score * 100)}%)` : "";
+        return `${i + 1}. ${a.artist} — ${a.title}${pct}`;
+      });
+    } catch {}
+    await notifyDiscord({
+      embeds: [
+        trackEmbed({
+          artist,
+          title,
+          url: trackUrl,
+          source: track.source,
+          locale,
+          similarCount,
+          topSimilar,
+          filters: initialFilters,
+        }),
+      ],
+    });
+  });
 
   return (
     <Container className="py-10 sm:py-14" as="article">
